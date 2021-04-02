@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
+const ThoughtsService = require('./thoughts-service')
 
 const app = express()
 
@@ -14,6 +15,15 @@ const morganOption = (NODE_ENV === 'production')
 app.use(morgan(morganOption))
 app.use(cors())
 app.use(helmet())
+
+app.get('/thoughts', (req,res,next) => {
+    knexInstance = req.app.get('db')
+    ThoughtsService.getAllThoughts(knexInstance)
+        .then(thoughts => {
+            res.json(thoughts)
+        })
+        .catch(next)
+})
 
 app.get('/', (req, res) => {
     res.send('Hello, world!')
