@@ -25,6 +25,22 @@ app.get('/thoughts', (req,res,next) => {
         .catch(next)
 })
 
+app.get('/thoughts/:thought_id', (req,res,next) => {
+    const knexInstance = req.app.get('db')
+    const {thought_id} = req.params
+
+    ThoughtsService.getById(knexInstance, thought_id)
+        .then(thought => {
+            if(!thought) {
+                return res.status(404).json({
+                    error: {message: 'Thought doesn\'t exist'}
+                })
+            }
+            res.json(thought)
+        })
+        .catch(next)
+})
+
 app.get('/', (req, res) => {
     res.send('Hello, world!')
 })
