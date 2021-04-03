@@ -4,7 +4,9 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
-const ThoughtsService = require('./thoughts-service')
+const thoughtsRouter = require('./thoughts/thoughts-router')
+const usersRouter = require('./users/users-router')
+const moodsRouter = require('./moods/moods-router')
 
 const app = express()
 
@@ -16,34 +18,14 @@ app.use(morgan(morganOption))
 app.use(cors())
 app.use(helmet())
 
-app.get('/thoughts', (req,res,next) => {
-    knexInstance = req.app.get('db')
-    ThoughtsService.getAllThoughts(knexInstance)
-        .then(thoughts => {
-            res.json(thoughts)
-        })
-        .catch(next)
-})
-
-app.get('/thoughts/:thought_id', (req,res,next) => {
-    const knexInstance = req.app.get('db')
-    const {thought_id} = req.params
-
-    ThoughtsService.getById(knexInstance, thought_id)
-        .then(thought => {
-            if(!thought) {
-                return res.status(404).json({
-                    error: {message: 'Thought doesn\'t exist'}
-                })
-            }
-            res.json(thought)
-        })
-        .catch(next)
-})
+app.use('/api/thoughts', thoughtsRouter)
+app.use('/api/users', usersRouter )
+app.use('/api/moods', moodsRouter)
 
 app.get('/', (req, res) => {
     res.send('Hello, world!')
 })
+
 
 app.use(function errorHandler(error, req, res, next) {
     let response

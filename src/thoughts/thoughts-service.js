@@ -3,14 +3,14 @@ const ThoughtsService = {
         return knex.select('*').from('thoughtful_thoughts');
     },
 
-    insertThought(knex, newThought){
-        return knex 
+    insertThought(knex, newThought) {
+        return knex
             .insert(newThought)
             .into('thoughtful_thoughts')
             .returning('*')
             .then(rows => {
-                return rows[0];
-            });
+                return rows[0]
+            })
     },
 
     getById(knex, id){
@@ -21,13 +21,13 @@ const ThoughtsService = {
             .first();
     },
 
-    deleteNote(knex, id){
+    deleteThought(knex, id){
         return knex('thoughtful_thoughts')
             .where('id', id)
             .delete();
     },
 
-    updateNote(knex, id, newThoughtField){
+    updateThought(knex, id, newThoughtField){
         return knex('thoughtful_thoughts')
             .where('id', id)
             .update(newThoughtField);
