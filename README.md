@@ -23,6 +23,7 @@ Run the tests `npm test`
 
 Seed the table `psql -U dunder_mifflen -d thoughtful -f ./seeds/seed.thoughtful_thoughts.sql`
 
+
 ## Deploying
 
 When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's main branch.

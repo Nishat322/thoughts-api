@@ -1,8 +1,17 @@
+const path = require('path')
 const express = require('express')
+const xss = require('xss')
 const ThoughtsService = require('./thoughts-service')
 
 const thoughtsRouter = express.Router()
 const jsonParser = express.json()
+
+const serializeThought = thought => ({
+    id: thought.id,
+    thought_name: xss(thought.thought_name),
+    author: xss(thought.author),
+    date_added: thought.date_added
+})
 
 thoughtsRouter
     .route('/')
@@ -10,17 +19,27 @@ thoughtsRouter
         knexInstance = req.app.get('db')
         ThoughtsService.getAllThoughts(knexInstance)
             .then(thoughts => {
-                res.json(thoughts)
+                res.json(thoughts.map(serializeThought))
             })
             .catch(next)
     })
     .post(jsonParser, (req,res,next) => {
-        const {thought_name} = req.body
-        const newThought = thought_name
-        ThoughtsService.insertThought(req.app.get('db'), newThought)
+        const {thought_name, author} = req.body
+        const newThought = {thought_name}
+        const knexInstance = req.app.get('db')
+
+        if(!thought_name) {
+            return res.status(400).json({
+                error: {message: 'Missing \'thought_name\' in request body'}
+            })
+        }
+
+        newThought.author = author
+
+        ThoughtsService.insertThought(knexInstance, newThought)
             .then(thought => {
                 res.status(201)
-                .location(`/thoughts/${thought.id}`)
+                .location(path.posix.join(req.originalUrl,`/${thought.id}`))
                 .json(thought)
             })
             .catch(next)
@@ -46,7 +65,8 @@ thoughtsRouter
             res.json({
                 id: res.thought.id,
                 date_added: res.thought.date_added,
-                thought_name: res.thought.thought_name,
+                thought_name: xss(res.thought.thought_name),
+                author: xss(res.thought.author)
             })
     })
     .delete((req,res,next) => {
