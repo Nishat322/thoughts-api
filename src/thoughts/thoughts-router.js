@@ -17,8 +17,10 @@ thoughtsRouter
     .route('/')
     .get((req,res,next) => {
         knexInstance = req.app.get('db')
+        console.log('GET route')
         ThoughtsService.getAllThoughts(knexInstance)
             .then(thoughts => {
+                console.log(thoughts)
                 res.json(thoughts.map(serializeThought))
             })
             .catch(next)
