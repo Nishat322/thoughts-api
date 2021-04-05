@@ -127,7 +127,7 @@ describe('Thoughts Endpoints', function(){
                 )
         })
 
-        it('responds with 400 and an error message when the \'title\' is missing', () => {
+        it('responds with 400 and an error message when the \'thought_name\' is missing', () => {
             return supertest(app)
                 .post('/api/thoughts')
                 .send({random: 'foo'})
